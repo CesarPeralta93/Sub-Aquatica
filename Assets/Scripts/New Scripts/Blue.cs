@@ -13,14 +13,17 @@ public class Blue : MonoBehaviour
     InputAction fireLightOrb;
     InputAction lightpulse;
     InputAction pauseGame;
+    InputAction bubble;
     public Animator anim;
     public Rigidbody2D rb;
+
+    Vector2 checkpointPos;
 
     public GameObject HUD;
     public GameObject pauseCanvas;
     public bool isPaused = false;
 
-    public GameObject lightOrb, lightPulse;
+    public GameObject lightOrb, lightPulse, burbuja;
     public Transform lightOrbFirePoint;
 
     public bool canDash, isDashing;
@@ -29,6 +32,8 @@ public class Blue : MonoBehaviour
 
     public bool canLightOrb, isLightOrbing;
     public float lightOrbCooldown;
+
+    public bool canBubble, isBubbleCooldown;
 
     private Vector3 mousePos;
     public Vector3 axis;
@@ -55,7 +60,8 @@ public class Blue : MonoBehaviour
         input = GetComponent<PlayerInput>();
         move = input.actions.FindAction("Move");
         canDash = true;
-
+        canBubble = true;
+        checkpointPos = transform.position;
     }
 
 
@@ -134,6 +140,22 @@ public class Blue : MonoBehaviour
         if(direction.x != 0 || direction.y != 0)
         {
             anim.SetBool("Moving", true);
+        }
+    }
+
+    public void Bubble(InputAction.CallbackContext context)
+    {
+        burbujaCooldown.fillAmount = 0;
+        if(canBubble == true)
+        {
+            if(context.performed)
+            {
+                Instantiate(burbuja, lightOrbFirePoint.position, lightOrbFirePoint.rotation);
+            }
+            else
+            {
+                return;
+            }
         }
     }
 
@@ -230,6 +252,10 @@ public class Blue : MonoBehaviour
             Debug.Log(bounceSpeed);
             Debug.DrawRay(collision.contacts[0].point, direction, Color.red, 10);
         }
+        if(collision.gameObject.tag == "Estalactitas")
+        {
+            StartCoroutine(Respawn(1f));
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -247,5 +273,19 @@ public class Blue : MonoBehaviour
         {
             interactuable = null;
         }
+    }
+
+    public IEnumerator Respawn(float respawnDuration)
+    {
+        rb.velocity = new Vector2(0, 0);
+        transform.localScale = new Vector3(0, 0, 0);
+        yield return new WaitForSeconds(respawnDuration);
+        transform.position = checkpointPos;
+        transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+    }
+
+    public void UpdateCheckpoint(Vector2 pos)
+    {
+        checkpointPos = pos;
     }
 }
