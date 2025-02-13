@@ -21,6 +21,7 @@ public class Blue : MonoBehaviour
 
     public GameObject HUD;
     public GameObject pauseCanvas;
+    public GameObject deathCanvas;
     public bool isPaused = false;
 
     public GameObject lightOrb, lightPulse, burbuja;
@@ -57,6 +58,7 @@ public class Blue : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("mviendo");
         input = GetComponent<PlayerInput>();
         move = input.actions.FindAction("Move");
         canDash = true;
@@ -254,7 +256,11 @@ public class Blue : MonoBehaviour
         }
         if(collision.gameObject.tag == "Estalactitas")
         {
-            StartCoroutine(Respawn(1f));
+            Die();
+        }
+        if(collision.gameObject.tag == "Hollum")
+        {
+            Die();
         }
     }
 
@@ -275,11 +281,22 @@ public class Blue : MonoBehaviour
         }
     }
 
+    public void Die()
+    {
+        deathCanvas.SetActive(true);
+    }
+
+    public void Respawn()
+    {
+        StartCoroutine(Respawn(1));
+    }
+
     public IEnumerator Respawn(float respawnDuration)
     {
         rb.velocity = new Vector2(0, 0);
         transform.localScale = new Vector3(0, 0, 0);
         yield return new WaitForSeconds(respawnDuration);
+        deathCanvas.SetActive(false);
         transform.position = checkpointPos;
         transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
     }

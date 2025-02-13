@@ -9,6 +9,7 @@ TagManager:
   - Bubbles
   - Estalactitas
   - Checkpoint
+  - Hollum
   layers:
   - Default
   - TransparentFX
